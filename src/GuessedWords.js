@@ -17,10 +17,12 @@ const GuessedWords = (props) => {
     contents = (
       <div data-test="guessed-words">
         <h1>Guessed Words</h1>
-        <table>
-          <thead>
-            <tr>Guess</tr>
-            <tr>Matching Letters</tr>
+        <table className="table table-sm">
+          <thead className="thead-light">
+            <tr>
+              <th>Guess</th>
+              <th>Matching Letters</th>
+            </tr>
           </thead>
           <tbody>{guessedWordsRows}</tbody>
         </table>
