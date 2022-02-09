@@ -2,7 +2,7 @@ import Enzyme, { shallow } from "enzyme";
 import EnzymeAdapter from "@wojtekmaj/enzyme-adapter-react-17";
 import Congrats from "./Congrats";
 import checkPropTypes from "check-prop-types";
-import propTypes from "prop-types";
+import PropTypes from "prop-types";
 // import findByTestAttr from "../test/testUtils";
 
 Enzyme.configure({ adapter: new EnzymeAdapter() });
