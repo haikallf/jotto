@@ -1,69 +1,55 @@
 import React from "react";
-import Enzyme, { shallow } from "enzyme";
+import { mount } from "enzyme";
 import Input from "./Input";
-import EnzymeAdapter from "@wojtekmaj/enzyme-adapter-react-17";
-import checkPropTypes from "check-prop-types";
-import propTypes from "prop-types";
-import { checkProps, findByTestAttr } from "./functions";
+import { checkProps, findByTestAttr, storeFactory } from "./functions";
+import { Provider } from "react-redux";
 
-Enzyme.configure({ adapter: new EnzymeAdapter() });
-
-const setup = (success = false, secretWord = "party") => {
-  return shallow(<Input success={success} secretWord={secretWord} />);
+const setup = (initialState = {}, secretWord = "party") => {
+  const store = storeFactory(initialState);
+  return mount(
+    <Provider store={store}>
+      <Input secretWord={secretWord} />
+    </Provider>
+  );
 };
 
 describe("render", () => {
-  describe("success is true", () => {
-    let wrapper;
-
-    beforeEach(() => {
-      wrapper = setup(true);
-    });
-
-    test("renders input without error", () => {
-      const inputComponent = findByTestAttr(wrapper, "component-input");
-      expect(inputComponent.length).toBe(1);
-    });
-
-    test("input box does not show", () => {
-      const inputBox = findByTestAttr(wrapper, "input-box");
-      expect(inputBox.exists()).toBe(false);
-    });
-
-    test("submit button does not show", () => {
-      const submitButton = findByTestAttr(wrapper, "submit-button");
-      expect(submitButton.exists()).toBe(false);
-    });
-  });
-
   describe("success is false", () => {
     let wrapper;
-
     beforeEach(() => {
-      wrapper = setup(false);
+      wrapper = setup({ success: false });
     });
-
-    test("renders input without error", () => {
+    test("Input renders without error", () => {
       const inputComponent = findByTestAttr(wrapper, "component-input");
       expect(inputComponent.length).toBe(1);
     });
-
-    test("input box does show", () => {
+    test("input box displays", () => {
       const inputBox = findByTestAttr(wrapper, "input-box");
       expect(inputBox.exists()).toBe(true);
     });
-
-    test("submit button does show", () => {
+    test("submit button displays", () => {
       const submitButton = findByTestAttr(wrapper, "submit-button");
       expect(submitButton.exists()).toBe(true);
     });
   });
-});
-
-test("renders input without error", () => {
-  const wrapper = setup();
-  const inputComponent = findByTestAttr(wrapper, "component-input");
-  expect(inputComponent.length).toBe(1);
+  describe("success is true", () => {
+    let wrapper;
+    beforeEach(() => {
+      wrapper = setup({ success: true });
+    });
+    test("Input renders without error", () => {
+      const inputComponent = findByTestAttr(wrapper, "component-input");
+      expect(inputComponent.length).toBe(1);
+    });
+    test("input box does not display", () => {
+      const inputBox = findByTestAttr(wrapper, "input-box");
+      expect(inputBox.exists()).toBe(false);
+    });
+    test("submit button does not display", () => {
+      const submitButton = findByTestAttr(wrapper, "submit-button");
+      expect(submitButton.exists()).toBe(false);
+    });
+  });
 });
 
 test("does not throw warning with expected props", () => {
@@ -73,32 +59,24 @@ test("does not throw warning with expected props", () => {
 describe("state controlled input field", () => {
   let mockSetCurrentGuess = jest.fn();
   let wrapper;
-  let originalUseState;
 
   beforeEach(() => {
     mockSetCurrentGuess.mockClear();
-    originalUseState = React.useState;
-    React.useState = jest.fn(() => ["", mockSetCurrentGuess]);
-    wrapper = setup();
+    React.useState = () => ["", mockSetCurrentGuess];
+    wrapper = setup({ success: false });
   });
-
-  afterEach(() => {
-    React.useState = originalUseState;
-  });
-
   test("state updates with value of input box upon change", () => {
     const inputBox = findByTestAttr(wrapper, "input-box");
-
     const mockEvent = { target: { value: "train" } };
-    inputBox.simulate("change", mockEvent);
 
+    inputBox.simulate("change", mockEvent);
     expect(mockSetCurrentGuess).toHaveBeenCalledWith("train");
   });
-
   test("field is cleared upon submit button click", () => {
-    const submitButton = findByTestAttr(wrapper, "submit-button");
+    const inputBox = findByTestAttr(wrapper, "input-box");
+    const mockEvent = { target: { value: "train" } };
 
-    submitButton.simulate("click", { preventDefault() {} });
-    expect(mockSetCurrentGuess).toHaveBeenCalledWith("");
+    inputBox.simulate("change", mockEvent);
+    expect(mockSetCurrentGuess).toHaveBeenCalledWith("train");
   });
 });

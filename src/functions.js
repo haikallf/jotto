@@ -1,8 +1,11 @@
-import Enzyme, { shallow } from "enzyme";
-import EnzymeAdapter from "@wojtekmaj/enzyme-adapter-react-17";
-import Congrats from "./Congrats";
 import checkPropTypes from "check-prop-types";
 import propTypes from "prop-types";
+import { createStore } from "redux";
+import rootReducer from "./reducers";
+
+export const storeFactory = (initialState) => {
+  return createStore(rootReducer, initialState);
+};
 
 export const findByTestAttr = (wrapper, val) => {
   return wrapper.find(`[data-test="${val}"]`);
