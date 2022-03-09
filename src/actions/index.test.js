@@ -1,4 +1,5 @@
 import moxios from "moxios";
+import { storeFactory } from "../functions";
 import { getSecretWord, correctGuess, actionTypes } from "./";
 
 // describe("correctGuess", () => {
@@ -18,12 +19,14 @@ describe("getSecretWord", () => {
   });
 
   test("secretword is returned", () => {
+    const store = storeFactory();
     moxios.wait(() => {
       const request = moxios.requests.mostRecent();
       request.respondWith({ status: 200, response: "party" });
     });
 
-    return getSecretWord().then((secretWord) => {
+    return store.dispatch(getSecretWord()).then(() => {
+      const secretWord = store.getState().secretWord;
       expect(secretWord).toBe("party");
     });
   });
